@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>AI Skin Analyzer</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+
+/* 🌸 FULL BACKGROUND FIX */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+
+    background:
+        linear-gradient(rgba(255, 230, 240, 0.7), rgba(230, 247, 255, 0.7)),
+        url("https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?auto=format&fit=crop&w=1500&q=80");
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+/* CENTER CONTAINER */
+.container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* GLASS CARD */
+.card-box {
+    width: 420px;
+    padding: 30px;
+    border-radius: 20px;
+
+    background: rgba(255,255,255,0.75);
+    backdrop-filter: blur(12px);
+
+    box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+    text-align: center;
+
+    animation: fadeIn 0.6s ease-in-out;
+}
+
+/* TITLE */
+h2 {
+    font-weight: 600;
+    color: #ff4da6;
+}
+
+/* INPUT */
+input[type="file"] {
+    border-radius: 10px;
+    padding: 10px;
+}
+
+/* BUTTON */
+button {
+    background: #ff4da6;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 12px;
+    color: white;
+    font-weight: 500;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #e60073;
+    transform: scale(1.05);
+}
+
+/* RESULT BOX */
+.result-box {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 12px;
+    font-weight: 500;
+}
+
+/* SKIN COLORS */
+.oily { background: #fff3cd; color: #856404; }
+.dry { background: #d1ecf1; color: #0c5460; }
+.combination { background: #d4edda; color: #155724; }
+.acne { background: #f8d7da; color: #721c24; }
+
+/* ANIMATION */
+@keyframes fadeIn {
+    from {opacity: 0; transform: translateY(20px);}
+    to {opacity: 1; transform: translateY(0);}
+}
+
+/* BACK LINK */
+.back-btn {
+    margin-top: 15px;
+    display: inline-block;
+    color: #555;
+    text-decoration: none;
+}
+
+.back-btn:hover {
+    color: #000;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="card-box">
+
+<h2>✨ AI Skin Analyzer</h2>
+<p style="color:#666;">Upload your face image for analysis</p>
+
+<input type="file" id="imageInput" class="form-control mt-3">
+
+<button class="mt-3" onclick="analyzeSkin()">
+Analyze Skin
+</button>
+
+<div id="result" class="result-box mt-4">
+Result will appear here...
+</div>
+
+<a href="/" class="back-btn">← Back to Home</a>
+
+</div>
+
+</div>
+
+<script>
+function analyzeSkin() {
+
+    let file = document.getElementById("imageInput").files[0];
+
+    if(!file){
+        alert("Please upload image first");
+        return;
+    }
+
+    let formData = new FormData();
+    formData.append("image", file);
+
+    fetch("/analyze", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        let box = document.getElementById("result");
+
+        box.className = "result-box";
+
+        box.innerHTML = "Detected: <b>" + data.result + "</b><br>" + data.advice;
+
+        if(data.result === "Oily Skin") box.classList.add("oily");
+        else if(data.result === "Dry Skin") box.classList.add("dry");
+        else if(data.result === "Combination Skin") box.classList.add("combination");
+        else box.classList.add("acne");
+    });
+}
+</script>
+
+<footer class="footer-advanced">
+
+<div class="container footer-grid">
+
+    <!-- LOGO -->
+    <div>
+        <h2 class="logo">GlowCare 🌸</h2>
+        <p class="partner">Partnered with BeautyCare</p>
+    </div>
+
+    <!-- SHOP -->
+    <div>
+        <h5>Shop</h5>
+        <ul>
+            <li>Facial Cleansers</li>
+            <li>Moisturizers</li>
+            <li>Serums</li>
+            <li>Face Scrubs</li>
+            <li>Masks</li>
+            <li>All Products</li>
+        </ul>
+    </div>
+
+    <!-- LEARN -->
+    <div>
+        <h5>Learn</h5>
+        <ul>
+            <li>Privacy Policy</li>
+            <li>Blogs & Tips</li>
+            <li>Skin Care Guide</li>
+            <li>Terms of Use</li>
+        </ul>
+    </div>
+
+    <!-- HELP -->
+    <div>
+        <h5>Help</h5>
+        <ul>
+            <li>Contact Us</li>
+            <li>About Us</li>
+            <li>FAQ</li>
+            <li>Terms & Conditions</li>
+        </ul>
+    </div>
+
+    <!-- SOCIAL -->
+    <div>
+        <h5>Follow Us</h5>
+        <div class="social-icons">
+            <span>📱</span>
+            <span>📘</span>
+            <span>📸</span>
+            <span>▶</span>
+        </div>
+    </div>
+
+</div>
+
+<hr>
+
+<p class="copyright">
+    © 2026 GlowCare. All rights reserved 💖
+</p>
+
+</footer>

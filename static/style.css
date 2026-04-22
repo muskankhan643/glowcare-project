@@ -1,0 +1,173 @@
+/* 🔥 FULL PAGE FIX (IMPORTANT FOR FOOTER) */
+html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 🌸 AESTHETIC BACKGROUND */
+body {
+    background: 
+        linear-gradient(rgba(255, 230, 240, 0.7), rgba(230, 247, 255, 0.7)),
+        url("https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?auto=format&fit=crop&w=1500&q=80");
+
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+
+    font-family: 'Poppins', sans-serif;
+}
+
+/* 🔥 MAIN CONTENT PUSH */
+.main-content {
+    flex: 1;
+}
+
+/* TITLE */
+h1 {
+    color: #ff4da6;
+    font-weight: 600;
+    font-size: 38px;
+}
+
+/* container */
+.container {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* CARD FIX */
+.card {
+    width: 300px;
+    height: 520px;
+    border-radius: 18px;
+
+    display: flex;
+    flex-direction: column;
+
+    padding: 12px;
+    overflow: hidden;
+
+    border: 1px solid rgba(255,255,255,0.4);
+
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(10px);
+
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+
+    transition: 0.3s;
+}
+
+/* hover effect */
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+}
+
+/* IMAGE FIX */
+.card img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 12px;
+}
+
+/* TEXT spacing fix */
+.card h3 {
+    margin: 10px 0 5px;
+    font-weight: 600;
+}
+
+.card p {
+    margin: 3px 0;
+}
+
+/* 🔥 NAVBAR BRAND */
+.navbar-brand {
+    font-size: 32px;
+    font-weight: 700;
+    color: #ff4da6;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 8px rgba(255, 77, 166, 0.3);
+}
+
+.navbar-brand:hover {
+    color: #e60073;
+}
+
+/* smooth font */
+* {
+    transition: 0.2s;
+}
+
+/* 🌸 ADVANCED FOOTER */
+.footer-advanced {
+    background: #f8f5ef;
+    padding: 50px 20px;
+    color: #333;
+    margin-top: auto;  /* 🔥 IMPORTANT FIX */
+}
+
+/* GRID */
+.footer-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 30px;
+}
+
+/* LOGO */
+.logo {
+    color: #ff4da6;
+    font-weight: 600;
+    font-size: 22px;
+}
+
+/* HEADINGS */
+.footer-advanced h5 {
+    font-weight: 600;
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
+/* LIST */
+.footer-advanced ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-advanced ul li {
+    margin: 6px 0;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.footer-advanced ul li:hover {
+    color: #ff4da6;
+}
+
+/* SOCIAL */
+.social-icons span {
+    font-size: 20px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.social-icons span:hover {
+    color: #ff4da6;
+}
+
+/* COPYRIGHT */
+.footer-advanced hr {
+    margin-top: 30px;
+}
+
+.footer-advanced .copyright {
+    text-align: center;
+    font-size: 14px;
+    margin-top: 10px;
+}
