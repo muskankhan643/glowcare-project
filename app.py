@@ -3,13 +3,10 @@ import sqlite3
 
 app = Flask(__name__)
 
-# 🟡 PRESENTATION SWITCH (IMPORTANT)
-PRESENTATION_MODE = True   # ⭐ True = blank demo | False = real DB data
+PRESENTATION_MODE = True
 
-# 🛒 CART
 cart = {}
 
-# 🛍️ PRODUCTS
 products = [
     {"name": "Cleanser", "price": 299, "img": "cleanser.webp", "rating": 4.5},
     {"name": "Serum", "price": 499, "img": "serum.webp", "rating": 4.7},
@@ -25,7 +22,7 @@ products = [
     {"name": "Hair Oil", "price": 299, "img": "hairoil.webp", "rating": 4.5}
 ]
 
-# 🗄️ INIT DATABASE
+# INIT DB
 def init_db():
     conn = sqlite3.connect('database.db')
     c = conn.cursor()
@@ -51,12 +48,12 @@ def init_db():
     conn.commit()
     conn.close()
 
-# 🏠 HOME
+# HOME
 @app.route('/')
 def home():
     return render_template("index.html", products=products)
 
-# ➕ ADD TO CART
+# ADD TO CART
 @app.route('/add/<name>')
 def add(name):
     if name in cart:
@@ -67,19 +64,19 @@ def add(name):
                 cart[name] = {"data": p, "qty": 1}
     return redirect(url_for('home'))
 
-# 🧾 CART
+# CART
 @app.route('/cart')
 def view_cart():
     total = sum(item["data"]["price"] * item["qty"] for item in cart.values())
     return render_template("cart.html", cart=cart, total=total)
 
-# 💳 CHECKOUT
+# CHECKOUT
 @app.route('/checkout')
 def checkout():
     total = sum(item["data"]["price"] * item["qty"] for item in cart.values())
     return render_template("checkout.html", total=total)
 
-# 🎉 PLACE ORDER
+# ORDER
 @app.route('/place_order', methods=['POST'])
 def place_order():
     conn = sqlite3.connect('database.db')
@@ -101,12 +98,12 @@ def place_order():
     cart.clear()
     return redirect(url_for('success'))
 
-# 🎉 SUCCESS
+# SUCCESS
 @app.route('/success')
 def success():
     return render_template("success.html")
 
-# 👤 ACCOUNT PAGE (FIXED + PRESENTATION MODE)
+# ACCOUNT
 @app.route('/account')
 def account():
     conn = sqlite3.connect('database.db')
@@ -117,30 +114,17 @@ def account():
 
     conn.close()
 
-    # ⭐ PRESENTATION MODE LOGIC
     if PRESENTATION_MODE:
-        user = {
-            "name": "",
-            "phone": "",
-            "address": ""
-        }
+        user = {"name": "", "phone": "", "address": ""}
     else:
         if data:
-            user = {
-                "name": data[1],
-                "phone": data[2],
-                "address": data[3]
-            }
+            user = {"name": data[1], "phone": data[2], "address": data[3]}
         else:
-            user = {
-                "name": "",
-                "phone": "",
-                "address": ""
-            }
+            user = {"name": "", "phone": "", "address": ""}
 
     return render_template("account.html", user=user)
 
-# 💾 SAVE ACCOUNT
+# SAVE ACCOUNT
 @app.route('/save_account', methods=['POST'])
 def save_account():
     name = request.form.get("name")
@@ -151,23 +135,19 @@ def save_account():
     c = conn.cursor()
 
     c.execute("DELETE FROM users")
-
-    c.execute(
-        "INSERT INTO users (name, phone, address) VALUES (?, ?, ?)",
-        (name, phone, address)
-    )
+    c.execute("INSERT INTO users (name, phone, address) VALUES (?, ?, ?)",
+              (name, phone, address))
 
     conn.commit()
     conn.close()
 
     return redirect(url_for('account'))
 
-# 🔍 ANALYZER
+# ANALYZER
 @app.route('/analyzer')
 def analyzer():
     return render_template("analyzer.html")
 
-# 🤖 AI ANALYZER
 @app.route('/analyze', methods=['POST'])
 def analyze():
     import random
@@ -188,7 +168,7 @@ def analyze():
         "advice": advice[result]
     })
 
-# 🚀 RUN
+# RUN (RENDER READY)
 if __name__ == "__main__":
     init_db()
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=10000)
