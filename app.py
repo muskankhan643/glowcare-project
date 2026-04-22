@@ -1,5 +1,6 @@
 from flask import Flask, render_template, redirect, url_for, request, jsonify
 import sqlite3
+import urllib.parse
 
 app = Flask(__name__)
 
@@ -22,28 +23,23 @@ products = [
     {"name": "Hair Oil", "price": 299, "img": "hairoil.webp", "rating": 4.5}
 ]
 
-# INIT DB
 def init_db():
     conn = sqlite3.connect('database.db')
     c = conn.cursor()
 
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT,
-            phone TEXT,
-            address TEXT
-        )
-    ''')
+    c.execute('''CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT,
+        phone TEXT,
+        address TEXT
+    )''')
 
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS orders (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            product_name TEXT,
-            quantity INTEGER,
-            total_price INTEGER
-        )
-    ''')
+    c.execute('''CREATE TABLE IF NOT EXISTS orders (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        product_name TEXT,
+        quantity INTEGER,
+        total_price INTEGER
+    )''')
 
     conn.commit()
     conn.close()
@@ -54,15 +50,41 @@ def home():
     return render_template("index.html", products=products)
 
 # ADD TO CART
-@app.route('/add/<name>')
+@app.route('/add/<path:name>')
 def add(name):
+    name = urllib.parse.unquote(name)
+
+    for p in products:
+        if p["name"] == name:
+            if name in cart:
+                cart[name]["qty"] += 1
+            else:
+                cart[name] = {"data": p, "qty": 1}
+            break
+
+    return redirect(url_for('home'))
+
+# ➕ INCREASE QTY
+@app.route('/increase/<path:name>')
+def increase(name):
+    name = urllib.parse.unquote(name)
+
     if name in cart:
         cart[name]["qty"] += 1
-    else:
-        for p in products:
-            if p["name"] == name:
-                cart[name] = {"data": p, "qty": 1}
-    return redirect(url_for('home'))
+
+    return redirect(url_for('view_cart'))
+
+# ➖ DECREASE QTY
+@app.route('/decrease/<path:name>')
+def decrease(name):
+    name = urllib.parse.unquote(name)
+
+    if name in cart:
+        cart[name]["qty"] -= 1
+        if cart[name]["qty"] <= 0:
+            del cart[name]
+
+    return redirect(url_for('view_cart'))
 
 # CART
 @app.route('/cart')
@@ -76,7 +98,7 @@ def checkout():
     total = sum(item["data"]["price"] * item["qty"] for item in cart.values())
     return render_template("checkout.html", total=total)
 
-# ORDER
+# PLACE ORDER
 @app.route('/place_order', methods=['POST'])
 def place_order():
     conn = sqlite3.connect('database.db')
@@ -87,10 +109,8 @@ def place_order():
         qty = item["qty"]
         total = item["data"]["price"] * qty
 
-        c.execute(
-            "INSERT INTO orders (product_name, quantity, total_price) VALUES (?, ?, ?)",
-            (name, qty, total)
-        )
+        c.execute("INSERT INTO orders (product_name, quantity, total_price) VALUES (?, ?, ?)",
+                  (name, qty, total))
 
     conn.commit()
     conn.close()
@@ -98,7 +118,6 @@ def place_order():
     cart.clear()
     return redirect(url_for('success'))
 
-# SUCCESS
 @app.route('/success')
 def success():
     return render_template("success.html")
@@ -108,19 +127,14 @@ def success():
 def account():
     conn = sqlite3.connect('database.db')
     c = conn.cursor()
-
     c.execute("SELECT * FROM users ORDER BY id DESC LIMIT 1")
     data = c.fetchone()
-
     conn.close()
 
     if PRESENTATION_MODE:
         user = {"name": "", "phone": "", "address": ""}
     else:
-        if data:
-            user = {"name": data[1], "phone": data[2], "address": data[3]}
-        else:
-            user = {"name": "", "phone": "", "address": ""}
+        user = {"name": data[1], "phone": data[2], "address": data[3]} if data else {"name": "", "phone": "", "address": ""}
 
     return render_template("account.html", user=user)
 
@@ -163,12 +177,9 @@ def analyze():
 
     result = random.choice(skin_types)
 
-    return jsonify({
-        "result": result,
-        "advice": advice[result]
-    })
+    return jsonify({"result": result, "advice": advice[result]})
 
-# RUN (RENDER READY)
+# RUN
 if __name__ == "__main__":
     init_db()
     app.run(host="0.0.0.0", port=10000)
